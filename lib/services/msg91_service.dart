@@ -1,25 +1,36 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/msg91_config.dart';
-import '../config/supabase_config.dart';
 
 /// Handles sending & verifying OTPs via MSG91.
 ///
-/// Two modes:
+/// MSG91 is ALWAYS ON for real numbers — real SMS OTP is sent and verified.
+///
+/// The ONLY exception is the configured test-bypass number
+/// (Msg91Config.testPhone). For that single number no SMS is sent and the
+/// fixed OTP (Msg91Config.testOtp) logs in. Toggle it via
+/// Msg91Config.enableTestBypass.
+///
+/// Two real modes:
 ///  1. Edge-function mode (recommended): set Msg91Config.edgeFunctionUrl so the
 ///     authKey stays server-side.
 ///  2. Direct mode: calls MSG91 API from the app (fine for testing only).
-///
-/// When SupabaseConfig.useMockData == true, OTP is faked as `1234`.
 class Msg91Service {
   Msg91Service._();
   static final instance = Msg91Service._();
 
+  bool _isBypass(String phoneE164) {
+    if (!Msg91Config.enableTestBypass) return false;
+    final digits = phoneE164.replaceAll(RegExp(r'[^0-9]'), '');
+    return digits.endsWith(Msg91Config.testPhone);
+  }
+
   Future<bool> sendOtp(String phoneE164) async {
-    if (SupabaseConfig.useMockData) {
+    // Test-bypass number: skip MSG91 entirely, no SMS sent.
+    if (_isBypass(phoneE164)) {
       // ignore: avoid_print
-      print('[MOCK] OTP for $phoneE164 is 1234');
-      await Future.delayed(const Duration(milliseconds: 600));
+      print('[BYPASS] Test number $phoneE164 → OTP ${Msg91Config.testOtp}');
+      await Future.delayed(const Duration(milliseconds: 400));
       return true;
     }
 
@@ -51,9 +62,10 @@ class Msg91Service {
   }
 
   Future<bool> verifyOtp(String phoneE164, String otp) async {
-    if (SupabaseConfig.useMockData) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      return otp.trim() == '1234';
+    // Test-bypass number: accept the fixed OTP, no MSG91 call.
+    if (_isBypass(phoneE164)) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return otp.trim() == Msg91Config.testOtp;
     }
 
     final mobile = phoneE164.replaceAll(RegExp(r'[^0-9]'), '');
@@ -78,41 +90,26 @@ class Msg91Service {
   }
 
   Future<bool> resendOtp(String phoneE164) async {
-    if (SupabaseConfig.useMockData) {
-      await Future.delayed(const Duration(milliseconds: 400));
+    // Test-bypass number: nothing to resend.
+    if (_isBypass(phoneE164)) {
+      await Future.delayed(const Duration(milliseconds: 300));
       return true;
     }
     final mobile = phoneE164.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (Msg91Config.edgeFunctionUrl != null) {
+      final res = await http.post(
+        Uri.parse('${Msg91Config.edgeFunctionUrl}/resend'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'mobile': mobile}),
+      );
+      return res.statusCode == 200;
+    }
+
     final res = await http.get(
       Uri.parse(
           'https://control.msg91.com/api/v5/otp/retry?mobile=$mobile&retrytype=text'),
       headers: {'authkey': Msg91Config.authKey},
-    );
-    return res.statusCode == 200;
-  }
-
-  /// Sends a custom reminder SMS via an MSG91 Flow. Returns true on success.
-  /// If no Flow ID is configured, it is simulated (returns true) so the app is
-  /// testable without live SMS credits.
-  Future<bool> sendReminder(String phoneE164, Map<String, String> vars) async {
-    const flowId = Msg91Config.smsFlowId;
-    if (flowId == null || SupabaseConfig.useMockData) {
-      await Future.delayed(const Duration(milliseconds: 120));
-      return true; // simulated
-    }
-    final mobile = phoneE164.replaceAll(RegExp(r'[^0-9]'), '');
-    final recipient = <String, String>{'mobiles': mobile, ...vars};
-    final res = await http.post(
-      Uri.parse('https://control.msg91.com/api/v5/flow/'),
-      headers: {
-        'Content-Type': 'application/json',
-        'authkey': Msg91Config.authKey,
-      },
-      body: jsonEncode({
-        'flow_id': flowId,
-        'sender': Msg91Config.senderId,
-        'recipients': [recipient],
-      }),
     );
     return res.statusCode == 200;
   }

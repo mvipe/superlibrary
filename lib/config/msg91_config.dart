@@ -1,16 +1,29 @@
+/// MSG91 OTP configuration.
+///
+/// SECURITY NOTE: The authKey should ideally live server-side (a Supabase Edge
+/// Function) so it is never shipped inside the APK. For quick testing you can
+/// place it here, but move it to `services/msg91_service.dart`'s edge-function
+/// path before going to production.
 class Msg91Config {
-  static const String authKey = '404117AQvUYpgj64e33a96P1';
-  static const String templateId = '64e3441ad6fc05126946fb23';
+  static const String authKey = 'YOUR_MSG91_AUTH_KEY';
+  static const String templateId = 'YOUR_MSG91_TEMPLATE_ID';
 
   static const String senderId = 'SUPLIB';
   static const int otpLength = 4;
   static const int otpExpirySeconds = 300;
 
-  /// MSG91 Flow ID used to send custom reminder SMS (membership expiry, etc.).
-  /// Create a Flow in the MSG91 dashboard with a `##name##` and `##days##`
-  /// variable, then paste its Flow ID here. While null, reminder sending is
-  /// simulated (no real SMS is dispatched) so the UI stays fully testable.
-  static const String? smsFlowId = null;
+  /// ─── TEST BYPASS NUMBER ────────────────────────────────────────────────
+  /// MSG91 stays ON for every REAL number (real SMS OTP is sent & verified).
+  /// ONLY this one number is a bypass: no SMS is sent, and OTP `1234` logs in.
+  /// Use it for demos / Play Store review without spending SMS credits.
+  ///
+  ///   Test Mobile: 9999999999   →   OTP: 1234
+  ///
+  /// Set [enableTestBypass] = false before final production release to make
+  /// EVERY number (including this one) go through real MSG91.
+  static const bool enableTestBypass = true;
+  static const String testPhone = '9999999999';
+  static const String testOtp = '1234';
 
   /// If you deploy the send/verify OTP as a Supabase Edge Function, put its URL
   /// here and MSG91Service will call that instead of hitting MSG91 directly.

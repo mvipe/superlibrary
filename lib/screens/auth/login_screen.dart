@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_colors.dart';
+import '../../config/msg91_config.dart';
 import '../../services/msg91_service.dart';
 import 'otp_screen.dart';
 
@@ -54,11 +55,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 74,
                 height: 74,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: AppColors.heroGradient),
+                  gradient: const LinearGradient(colors: AppColors.heroGradient),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.35),
+                        color: AppColors.primary.withOpacity(0.35),
                         blurRadius: 20,
                         offset: const Offset(0, 10))
                   ],
@@ -84,10 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _phone,
                 keyboardType: TextInputType.phone,
-                autofillHints: const [
-                  AutofillHints.telephoneNumberNational,
-                  AutofillHints.telephoneNumber,
-                ],
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(10),
@@ -114,9 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 28),
               _loading
-                  ? Center(
+                  ? const Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: EdgeInsets.all(8),
                         child: CircularProgressIndicator(
                             color: AppColors.primary),
                       ),
@@ -131,6 +128,57 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: GoogleFonts.lexend(
                         fontSize: 12.5, color: AppColors.inkFaint)),
               ),
+              if (Msg91Config.enableTestBypass) ...[
+                const SizedBox(height: 24),
+                InkWell(
+                  onTap: () => setState(() => _phone.text = Msg91Config.testPhone),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: AppColors.primary.withOpacity(0.18)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.science_rounded,
+                            size: 18, color: AppColors.primary),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: GoogleFonts.lexend(
+                                  fontSize: 12.5, color: AppColors.inkSoft),
+                              children: [
+                                const TextSpan(text: 'Test login  •  '),
+                                TextSpan(
+                                    text: '${Msg91Config.testPhone}',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.ink)),
+                                const TextSpan(text: '   OTP '),
+                                TextSpan(
+                                    text: Msg91Config.testOtp,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.ink)),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Text('Tap to fill',
+                            style: GoogleFonts.lexend(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
