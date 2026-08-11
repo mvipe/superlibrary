@@ -113,4 +113,45 @@ class Msg91Service {
     );
     return res.statusCode == 200;
   }
+
+  /// Sends a reminder SMS (e.g. membership expiry) via an MSG91 Flow template.
+  ///
+  /// If [Msg91Config.smsFlowId] is null, this SIMULATES success (demo mode) so
+  /// the SMS screen works without spending credits. Set the Flow ID to send
+  /// real SMS. [vars] are the template variables (e.g. {'name': 'Rohit'}).
+  Future<bool> sendReminder(String phoneE164, Map<String, String> vars) async {
+    // Demo / simulate mode: no Flow ID configured.
+    if (Msg91Config.smsFlowId == null) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      return true;
+    }
+
+    final mobile = phoneE164.replaceAll(RegExp(r'[^0-9]'), '');
+    final withCc = mobile.startsWith('91') ? mobile : '91$mobile';
+
+    if (Msg91Config.edgeFunctionUrl != null) {
+      final res = await http.post(
+        Uri.parse('${Msg91Config.edgeFunctionUrl}/reminder'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'mobile': withCc, 'vars': vars}),
+      );
+      return res.statusCode == 200;
+    }
+
+    final res = await http.post(
+      Uri.parse('https://control.msg91.com/api/v5/flow/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'authkey': Msg91Config.authKey,
+      },
+      body: jsonEncode({
+        'flow_id': Msg91Config.smsFlowId,
+        'sender': Msg91Config.senderId,
+        'recipients': [
+          {'mobiles': withCc, ...vars},
+        ],
+      }),
+    );
+    return res.statusCode == 200;
+  }
 }

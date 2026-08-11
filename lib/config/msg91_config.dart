@@ -12,6 +12,11 @@ class Msg91Config {
   static const int otpLength = 4;
   static const int otpExpirySeconds = 300;
 
+  /// MSG91 Flow ID for the SMS reminder template (membership expiry / welcome).
+  /// Leave null to run SMS reminders in SIMULATE mode (no real SMS sent).
+  /// Set your Flow ID here once your template is approved to send real SMS.
+  static const String? smsFlowId = null;
+
   /// ─── TEST BYPASS NUMBER ────────────────────────────────────────────────
   /// MSG91 stays ON for every REAL number (real SMS OTP is sent & verified).
   /// ONLY this one number is a bypass: no SMS is sent, and OTP `1234` logs in.

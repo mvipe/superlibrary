@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 74,
                 height: 74,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: AppColors.heroGradient),
+                  gradient: LinearGradient(colors: AppColors.heroGradient),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -111,9 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 28),
               _loading
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: CircularProgressIndicator(
                             color: AppColors.primary),
                       ),
@@ -144,9 +144,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.science_rounded,
+                        Icon(Icons.science_rounded,
                             size: 18, color: AppColors.primary),
-                        const SizedBox(width: 10),
+   const SizedBox(width: 10),
                         Expanded(
                           child: RichText(
                             text: TextSpan(
@@ -156,13 +156,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const TextSpan(text: 'Test login  •  '),
                                 TextSpan(
                                     text: '${Msg91Config.testPhone}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.ink)),
                                 const TextSpan(text: '   OTP '),
                                 TextSpan(
                                     text: Msg91Config.testOtp,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.ink)),
                               ],
