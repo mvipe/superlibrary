@@ -5,8 +5,8 @@
 /// place it here, but move it to `services/msg91_service.dart`'s edge-function
 /// path before going to production.
 class Msg91Config {
-  static const String authKey = 'YOUR_MSG91_AUTH_KEY';
-  static const String templateId = 'YOUR_MSG91_TEMPLATE_ID';
+  static const String authKey = '404117AQvUYpgj64e33a96P1';
+  static const String templateId = '64e3441ad6fc05126946fb23';
 
   static const String senderId = 'SUPLIB';
   static const int otpLength = 4;
