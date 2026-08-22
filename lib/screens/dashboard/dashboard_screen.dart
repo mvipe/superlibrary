@@ -22,6 +22,7 @@ import '../reports/collection_report_screen.dart';
 import '../master/master_screen.dart';
 import '../shift/shift_screen.dart';
 import '../loans/loans_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onMenu;
@@ -171,7 +172,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(width: 12),
-        const Icon(Icons.notifications_none_rounded, size: 26),
+        InkWell(
+          borderRadius: BorderRadius.circular(AppColors.rMd),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+          child: const Padding(
+            padding: EdgeInsets.all(4),
+            child: Icon(Icons.notifications_none_rounded, size: 26),
+          ),
+        ),
       ],
     );
   }

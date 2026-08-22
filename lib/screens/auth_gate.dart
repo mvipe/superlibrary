@@ -37,15 +37,14 @@ class _Splash extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 78,
-              height: 78,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: AppColors.heroGradient),
-                borderRadius: BorderRadius.circular(AppColors.rXl),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppColors.rXl),
+              child: Image.asset(
+                'assets/images/AppLogo.png',
+                width: 78,
+                height: 78,
+                fit: BoxFit.cover,
               ),
-              child: const Icon(Icons.menu_book_rounded,
-                  color: Colors.white, size: 40),
             ),
             const SizedBox(height: 20),
             Text('SuperLibrary',

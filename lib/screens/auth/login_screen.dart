@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_colors.dart';
-import '../../config/msg91_config.dart';
 import '../../services/msg91_service.dart';
 import 'otp_screen.dart';
 
@@ -55,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 74,
                 height: 74,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: AppColors.heroGradient),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -64,8 +62,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         offset: const Offset(0, 10))
                   ],
                 ),
-                child: const Icon(Icons.menu_book_rounded,
-                    color: Colors.white, size: 38),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/AppLogo.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               const SizedBox(height: 28),
               Text('SuperLibrary',
@@ -128,57 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: GoogleFonts.lexend(
                         fontSize: 12.5, color: AppColors.inkFaint)),
               ),
-              if (Msg91Config.enableTestBypass) ...[
-                const SizedBox(height: 24),
-                InkWell(
-                  onTap: () => setState(() => _phone.text = Msg91Config.testPhone),
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.06),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                          color: AppColors.primary.withOpacity(0.18)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.science_rounded,
-                            size: 18, color: AppColors.primary),
-   const SizedBox(width: 10),
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              style: GoogleFonts.lexend(
-                                  fontSize: 12.5, color: AppColors.inkSoft),
-                              children: [
-                                const TextSpan(text: 'Test login  •  '),
-                                TextSpan(
-                                    text: '${Msg91Config.testPhone}',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.ink)),
-                                const TextSpan(text: '   OTP '),
-                                TextSpan(
-                                    text: Msg91Config.testOtp,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.ink)),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Text('Tap to fill',
-                            style: GoogleFonts.lexend(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
